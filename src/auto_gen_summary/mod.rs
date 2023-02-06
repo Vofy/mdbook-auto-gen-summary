@@ -169,7 +169,7 @@ fn gen_summary_lines(root_dir: &str, group: &MdGroup, use_first_line_as_link_tex
     lines.push(buff_link);
 
     for md in &group.md_list {
-        let path = md.path.replace(root_dir, "");
+        let path = md.path.replace(root_dir, "").replace(" ", "%20");
         if path == SUMMARY_FILE {
             continue;
         }
