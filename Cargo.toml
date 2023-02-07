@@ -2,7 +2,7 @@
 name = "mdbook-auto-gen-summary"
 version = "0.1.10"
 authors = ["George"]
-edition = "2018"
+edition = "2021"
 description = "A preprocessor and cli tool for mdbook to auto generate summary."
 license = "MIT"
 documentation = "https://crates.io/crates/mdbook-auto-gen-summary"

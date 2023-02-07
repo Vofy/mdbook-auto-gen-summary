@@ -1,24 +1,24 @@
 mod auto_gen_summary;
 
 use auto_gen_summary::AutoGenSummary;
-use clap::{App, Arg, ArgMatches, SubCommand};
+use clap::{Command, Arg, ArgMatches};
 use mdbook::errors::Error;
 use mdbook::preprocess::{CmdPreprocessor, Preprocessor};
 use std::io;
 use std::process;
 
-pub fn make_app() -> App<'static, 'static> {
-    App::new("auto-gen-summary-preprocessor")
+pub fn make_app() -> Command {
+    Command::new("auto-gen-summary-preprocessor")
         .about("A mdbook preprocessor to auto generate book summary")
         .subcommand(
-            SubCommand::with_name("supports")
-                .arg(Arg::with_name("renderer").required(true))
+            Command::new("supports")
+                .arg(Arg::new("renderer").required(true))
                 .about("Check whether a renderer is supported by this preprocessor"),
         )
         .subcommand(
-            SubCommand::with_name("gen")
-                .arg(Arg::with_name("dir").required(true).help("the dir of mdbook markdown src"))
-                .arg(Arg::with_name("title").required(false).short("t").help("make the first line of markdown file as line text in SUMMARY.md"))
+           Command::new("gen")
+                .arg(Arg::new("dir").required(true).help("the dir of mdbook markdown src"))
+                .arg(Arg::new("title").required(false).short('t').help("make the first line of markdown file as line text in SUMMARY.md"))
                 .about("gen SUMMARY.md"),
         )
 }
@@ -32,13 +32,13 @@ fn main() {
         handle_supports(&preprocessor, sub_args);
     } else if let Some(sub_args) = matches.subcommand_matches("gen") {
         let source_dir = sub_args
-            .value_of("dir")
+            .get_one::<String>("dir")
             .expect("Required argument")
             .to_string();
 
-        let use_first_line_as_link_text = sub_args.is_present("title");
+        let use_first_line_as_link_text = sub_args.get_one::<String>("title");
 
-        auto_gen_summary::gen_summary(&source_dir, use_first_line_as_link_text);
+        auto_gen_summary::gen_summary(&source_dir, use_first_line_as_link_text.is_some());
     } else if let Err(e) = handle_preprocessing(&preprocessor) {
         eprintln!("{}", e);
         process::exit(1);
@@ -65,7 +65,7 @@ fn handle_preprocessing(pre: &dyn Preprocessor) -> Result<(), Error> {
 }
 
 fn handle_supports(pre: &dyn Preprocessor, sub_args: &ArgMatches) -> ! {
-    let renderer = sub_args.value_of("renderer").expect("Required argument");
+    let renderer = sub_args.get_one::<String>("renderer").expect("Required argument");
     let supported = pre.supports_renderer(&renderer);
 
     if supported {

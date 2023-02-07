@@ -73,7 +73,7 @@ impl Preprocessor for AutoGenSummary {
                 return Ok(mdbook.book);
             }
             Err(e) => {
-                panic!(e);
+                panic!("{}", e);
             }
         };
     }
